@@ -10,21 +10,22 @@ Movie.instances = {};
 //CRUD OPERATIONS =============================================
 Movie.add = function (model) {
     var movie = new Movie(model);
-    Movie.instances[model.movieID] = movie
-    console.log('Movie: ' + model.isbn + " - " + model.title + " added!")
-}
+    Movie.instances[model.movieID] = movie;
+    console.log('Movie: ' + model.title + " - " + model.title + " added!")
+};
 
 Movie.update = function (model) {
     var movie = Movie.instances[model.movieID],
         date = model.releaseDate;
-    if (movie.title !== model.title) book.title = slots.title;
-    if (movie.releaseDate !== model.releaseDate) book.releaseDate = slots.releaseDate;
+    if (movie.title !== model.title) 
+        movie.title = slots.title;
+    if (movie.releaseDate !== model.releaseDate) 
+        movie.releaseDate = slots.releaseDate;
     console.log('Movie: ' + model.title + 'has been updated.')
-}
+};
 
-//create function expression Movie.destroy pass in movieID
 Movie.destroy = function (movieID) {
-    //if the movieID is in instances delete the book instance by movieID
+    //if the movieID is in instances delete the movie instance by movieID
     if (Movie.instances[movieID]) {
         console.log("Movie " + movieID + " deleted.")
         delete Movie.instances[movieID];
@@ -34,44 +35,49 @@ Movie.destroy = function (movieID) {
     }
 };
 
-//create function expression Movie.saveAll
+//  Save all book objects to Local Storage
 Movie.saveAll = function () {
-    //initialize variables for booksString, errorInd, numbrofbooks = bookinstances.length
-    var movieString = "",
-        errorInd = false,
-        numbrofmovies = Object.keys(Movie.instances).length;
-
+    var moviesString = "",
+        error = false,
+        nmrOfMovies = Object
+            .keys(Movie.instances)
+            .length;
     try {
-        movieString = JSON.stringify(Movie.instances);
-        localStorage.setItem("movies", movieString);
+        moviesString = JSON.stringify(Movie.instances);
+        localStorage.setItem("movies", moviesString);
     } catch (e) {
         alert("Error when writing to Local Storage\n" + e);
         error = true;
     }
-    if (!error) console.log(numbrofmovies + " movies saved.");
-}
+    if (!error) 
+        console.log(nmrOfMovies + " movies saved.");
+    };
 
 //create function expression to loadAll
-Move.loadAll = function () {
-    var key = '',
+Movie.loadAll = function () {
+    var key = "",
         keys = [],
-        movieString = "",
-        movies = {}
+        moviesString = "",
+        movies = {};
+
     try {
         if (localStorage.getItem('movies')) {
-            movieString = localStorage.getItem('movies');
+            moviesString = localStorage.getItem('movies');
         }
+
     } catch (e) {
         alert("Error when reading from Local Storage\n" + e);
     }
-    if (movieString) {
-        movies = JSON.parse(movieString);
+    if (moviesString) {
+        movies = JSON.parse(moviesString);
         keys = Object.keys(movies);
     }
-    keys.forEach(function () {
-        movieKey => Movie.instances[movieKey] = Movie.getModelFromObjectRow(movies[movieKey]);
-    })
-}
+    for (i = 0; i < keys.length; i++) {
+        key = keys[i];
+        Movie.instances[key] = Movie.getModelFromObjectRow(movies[key]);
+    }
+    console.log(keys.length + " movies loaded.");
+};
 
 //HELPERS =============================================
 Movie.getModelFromObjectRow = function (movieRow) {
@@ -80,18 +86,19 @@ Movie.getModelFromObjectRow = function (movieRow) {
 };
 
 //HELPERS =============================================
-Movie.createTestData = function () {
-  Movie.instances["1"] = new Movie(
-      {movieID:"1", title:"Lord of the Rings: The Fellowship...", releaseDate:2000});
-  Movie.instances["2"] = new Movie(
-      {movieID:"2", title:"The Matrix", releaseDate:1999});
-  Movie.instances["3"] = new Movie(
-      {movieID:"3", title:"Looper", releaseDate:2008});
-  Movie.saveAll();
+Movie.loadSeedData = function () {
+    Movie.instances["1"] = new Movie({movieID: "1", title: "Lord of the Rings: The Fellowship...", releaseDate: 2000});
+    Movie.instances["2"] = new Movie({movieID: "2", title: "The Matrix", releaseDate: 1999});
+    Movie.instances["3"] = new Movie({movieID: "3", title: "Looper", releaseDate: 2008});
+    Movie.saveAll();
 };
 
 Movie.clearData = function () {
-  if (confirm("Do you really want to delete all movie data?")) {
-    localStorage["movies"] = "{}";
-  }
+    if (confirm("Do you really want to delete all movie data?")) {
+        localStorage.movies = "{}";
+    }
+};
+
+Movie.IDGen = function () {
+    return Date.now();
 };
