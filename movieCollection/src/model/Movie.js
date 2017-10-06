@@ -18,16 +18,16 @@ Movie.update = function (model) {
     var movie = Movie.instances[model.movieID],
         date = model.releaseDate;
     if (movie.title !== model.title) 
-        movie.title = slots.title;
+        movie.title = model.title;
     if (movie.releaseDate !== model.releaseDate) 
-        movie.releaseDate = slots.releaseDate;
-    console.log('Movie: ' + model.title + 'has been updated.')
+        movie.releaseDate = model.releaseDate;
+    console.log('Movie: ' + model.title + 'has been updated.');
 };
 
 Movie.destroy = function (movieID) {
     //if the movieID is in instances delete the movie instance by movieID
     if (Movie.instances[movieID]) {
-        console.log("Movie " + movieID + " deleted.")
+        console.log("Movie " + movieID + " deleted.");
         delete Movie.instances[movieID];
     } else {
         //else log there is no record with that movieID

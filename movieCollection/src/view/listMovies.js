@@ -1,9 +1,30 @@
 mc.view.listMovies = {
     setupUI: function () {
         // select tbody element
-        // init keys(list) key(string) row(object literal) 
-        // get list from model
+        var tbodyEl = document.querySelector("table#Movies>tbody");
+        console.log(tbodyEl);
+        var keys = [],
+            key = "",
+            row = {},
+            i = 0;
+        Movie.loadAll();
         // get list of keys from instances
-        // iterate over keys and insert a row and insert cell (movieID > title > releaseDate)
-    },
-}
+        keys = Object.keys(Movie.instances);
+
+        for (i = 0; i < keys.length; i++) {
+            key = keys[i];
+            row = tbodyEl.insertRow();
+            movie = Movie.instances[key];
+            row
+                .insertCell(-1)
+                .textContent = movie.movieID;
+            row
+                .insertCell(-1)
+                .textContent = movie.title;
+            row
+                .insertCell(-1)
+                .textContent = movie.releaseDate;
+
+        }
+    }
+};
