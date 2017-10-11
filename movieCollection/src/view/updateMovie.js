@@ -1,3 +1,8 @@
+/**
+ *  TODO IMPLEMENT validation on user input for providing immediate feedback to the user,
+ *  validation on form submission for preventing the submission of invalid data
+ */
+
 mc.view.updateMovie = {
     setupUI: function () {
         //store form, save button and select input into vars
