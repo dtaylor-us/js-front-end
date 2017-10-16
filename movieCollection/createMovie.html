@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <title>Plain JS Minimal App Practice</title>
     <script src="src/lib/browserShims.js"></script>
+     <script src="src/lib/util.js"></script>
     <script src="src/lib/errorTypes.js"></script>
     <script src="src/ctrl/initialize.js"></script>
     <script src="src/model/Movie.js"></script>
@@ -22,8 +23,8 @@
     <main>
         <form id="Movie">
             <input type="hidden" name="movieID">
-            <div><label>Title: <input name="title" /></label></div>
-            <div><label>Release Date: <input name="releaseDate" /></label></div>
+            <div><label>Title: <input name="title" type="text"/></label></div>
+            <div><label>Release Date: <input name="releaseDate" type="date"/></label></div>
             <div><button type="button" name="save">Save</button></div>
         </form>
     </main>

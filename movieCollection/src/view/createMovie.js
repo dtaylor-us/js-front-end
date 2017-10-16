@@ -1,33 +1,59 @@
 /**
- *  TODO IMPLEMENT validation on user input for providing immediate feedback to the user,
- *  validation on form submission for preventing the submission of invalid data
+ *  Setup UI and Handle Submit event for Movie entry screen
  */
 
 mc.view.createMovie = {
     setupUI: function () {
-        // store submit button for form in a var
-        var saveButton = document.forms.Movie.save;
+        var formEl = document.forms.Movie,
+            saveButton = formEl.save,
+            titleMsg = "",
+            releaseDateMsg = "";
+
         // call Load method from model
         Movie.loadAll();
+
+        //add event handlers for responsive validation
+        formEl.title.addEventListener("input", function () {
+            titleMsg = Movie.checkTitle(formEl.title.value).message;
+            formEl.title.setCustomValidity(titleMsg);
+        });
+        formEl.releaseDate.addEventListener("input", function () {
+            releaseDateMsg = Movie.checkReleaseDate(formEl.releaseDate.value).message;
+            formEl.releaseDate.setCustomValidity(releaseDateMsg);
+        });
+
         // attach handler function to save button
-        saveButton.addEventListener('click', mc.view.createMovie.handleFormSubmit);
-        // attach before unload event listener onto window and call save all fucntion
-        // from model
+        saveButton.addEventListener('click', mc.view.createMovie.handleSaveButtonClickEvent);
+
+        // neutralize the submit event
+        formEl.addEventListener('submit', function (e) {
+            e.preventDefault();
+            formEl.reset();
+        });
+
+        // attach before unload event listener onto window and call save all fucntion from model
         window.addEventListener('beforeunload', Movie.saveAll);
     },
-    handleFormSubmit: function () {
+    handleSaveButtonClickEvent: function () {
         //store form in var element in vaasdfl
-        var form = document.forms.Movie;
-        var id = Movie.IDGen();
+        var formEl = document.forms.Movie,
+            id = Movie.IDGen(),
+            titleMsg = "",
+            dateMsg = "";
         // collect input from form in object literal and store it in var
         var movieObj = {
             movieID: id,
-            title: form.title.value,
-            releaseDate: form.releaseDate.value
+            title: formEl.title.value,
+            releaseDate: formEl.releaseDate.value
         };
+
+        titleMsg = Movie.checkTitle(movieObj.title).message;
+        formEl.title.setCustomValidity(titleMsg); //pass in message returned from check funtion
+
+        dateMsg = Movie.checkReleaseDate(movieObj.releaseDate).message;
+        formEl.releaseDate.setCustomValidity(dateMsg); //pass in message returned from check funtion
+
         //call add function from model and pass it object literal with input from form
-        Movie.add(movieObj);
-        //reset the form
-        form.reset();
+        if (formEl.checkValidity()) Movie.add(movieObj);
     }
 };

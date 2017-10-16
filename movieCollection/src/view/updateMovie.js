@@ -6,63 +6,83 @@
 mc.view.updateMovie = {
     setupUI: function () {
         //store form, save button and select input into vars
-        var form = document.forms.Movie;
-        var selectInput = form.selectMovie;
-        var updateButton = form.update;
+        var formEl = document.forms.Movie;
+        var selectEl = formEl.selectMovie;
+        var updateButton = formEl.update;
+
         // init key(string) keys(list) movie=null option=null;
         var key = "",
             keys = [],
             movie = null,
             optionEl = null,
             i = 0;
+
         // get movie list from model
         Movie.loadAll();
-        keys = Object.keys(Movie.instances);
 
-        for (i = 0; i < keys.length; i++) {
-            key = keys[i];
-            movie = Movie.instances[key];
-            optionEl = document.createElement("option");
-            optionEl.text = movie.title;
-            optionEl.value = movie.movieID;
-            selectInput.add(optionEl, null);
-        }
+        //setup movie selection list
+        util.populateSelectOptions(Movie.instances, selectEl, "movieID", "title");
+
         // when a movie is selected, fill the form with its data
-        selectInput.addEventListener("change", mc.view.updateMovie.handleSelection);
+        selectEl.addEventListener("change", function () {
+            var movie = null,
+                key = selectEl.value;
+            if (key) {
+                movie = Movie.instances[key];
+                ["movieID", "title", "releaseDate"].forEach(function (p) {
+                    formEl.value = key[p] !== undefined ? movie[p] : "";
+                    // delete custom validation error message which may have been set before
+                    formEl[p].setCustomValidity("");
+                })
+            } else {
+                formEl.reset();
+            }
+        });
+
+        // add event listeners for responsive validation
+        formEl.title.addEventListener("input", function () {
+            titleMsg = Movie.checkTitle(formEl.title.value).message;
+            formEl.title.setCustomValidity(titleMsg);
+        });
+        formEl.releaseDate.addEventListener("input", function () {
+            releaseDateMsg = Movie.checkTitle(formEl.releaseDate.value).message;
+            formEl.releaseDate.setCustomValidity(releaseDateMsg);
+        })
+
         // set an event handler for the submit/save button
         updateButton.addEventListener("click", mc.view.updateMovie.handleUpdate);
+
+        //neutrilize the submit event
+        formEl.addEventListener("submit", function (e) {
+            e.preventDefault();
+            formEl.reset();
+        });
         // handle the event when the browser window/tab is closed
         window.addEventListener("beforeunload", Movie.saveAll);
     },
 
-    handleSelection: function () {
-        var form = document.forms['Movie'];
-        var selectInput = form.selectMovie,
-            movie = null,
-            key = selectInput.value;
-        if (key) {
-            movie = Movie.instances[key];
-            form.movieID.value = movie.movieID;
-            form.title.value = movie.title;
-            form.releaseDate.value = movie.releaseDate;
-        } else {
-            form.reset();
-        }
-    },
-
     handleUpdate: function () {
         // target form element and select input create object literal from form inputs
-        var form = document.forms.Movie;
-        var selectInput = form.selectMovie;
+        var formEl = document.forms.Movie;
+        var selectInput = formEl.selectMovie;
         var movieObj = {
-            movieID: form.movieID.value,
-            title: form.title.value,
-            releaseDate: form.releaseDate.value
+            movieID: formEl.movieID.value,
+            title: formEl.title.value,
+            releaseDate: formEl.releaseDate.value
         };
 
-        Movie.update(movieObj);
-        selectInput.options[selectInput.selectedIndex].text = movieObj.title;
-        // and store it in var call model update method and pass it object literal
-        // update the selected option text to updated title reset form
+        // set error messages in case of constraint violations
+        titleMsg = Movie.checkTitle(movieObj.title).message;
+        formEl.title.setCustomValidity(); //pass in message returned from check funtion
+
+        dateMsg = Movie.checkReleaseDate(movieObj.releaseDate).message;
+        formEl.releaseDate.setCustomValidity(); //pass in message returned from check funtion
+
+        if (formEl.checkValidity()) {
+            Movie.update(movieObj);
+
+            // update the selected option text to updated title reset form
+            selectInput.options[selectInput.selectedIndex].text = movieObj.title;
+        }
     }
 };

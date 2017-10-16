@@ -5,12 +5,15 @@ function Movie(record) {
     this.title = "";
     this.releaseDate = 0;
     // if object contains properties validate them and set them if valid
-    if (this.arguments > 0) {
+    
         this.setMovieID(record.movieID);
         this.setTitle(record.title);
         this.setReleaseDate(record.releaseDate);
-    }
+    
+
 }
+
+Movie.instances = {};
 
 //CHECK validate the constraints defined for the properties
 // check movieID: Mandatory, Unique
@@ -24,6 +27,19 @@ Movie.checkMovieID = function (id) {
     }
 };
 
+
+//SETTER invokes the check function and is to be used for setting the value of the property
+// set movieID: Mandatory, Unique
+Movie.prototype.setMovieID = function (id) {
+    var validationResult = Movie.checkMovieID(id);
+    if (validationResult instanceof NoConstraintViolation) {
+        this.movieID = id;
+    } else {
+        throw validationResult;
+    }
+};
+
+
 // check title: Mandatory, Length
 Movie.checkTitle = function (title) {
     if (!title) {
@@ -34,6 +50,16 @@ Movie.checkTitle = function (title) {
         return new UniquenessConstraintViolation("This movie has already been collected");
     } else {
         return new NoConstraintViolation();
+    }
+};
+
+// set title: Mandatory, Length
+Movie.prototype.setTitle = function (title) {
+    var validationResult = Movie.checkTitle(title);
+    if (validationResult instanceof NoConstraintViolation) {
+        this.title = title;
+    } else {
+        throw validationResult;
     }
 };
 
@@ -63,38 +89,17 @@ Movie.checkReleaseDate = function (date) {
     }
 };
 
-//SETTER invokes the check function and is to be used for setting the value of the property
-// set movieID: Mandatory, Unique
-Movie.prototype.setMovieID = function (id) {
-    var validationResult = Movie.checkMovieID(id);
-    if (validationResult instanceof NoConstraintViolation) {
-        this.movieID = id;
-    } else {
-        throw validationResult;
-    }
-};
-
-// set title: Mandatory, Length
-Movie.prototype.setTitle = function (title) {
-    var validationResult = Movie.title(title);
-    if (validationResult instanceof NoConstraintViolation) {
-        this.title = title;
-    } else {
-        throw validationResult;
-    }
-};
-
 // set releaseDate: Range/Interval
 Movie.prototype.setReleaseDate = function (date) {
-    var validationResult = Movie.releaseDate(date);
+    var validationResult = Movie.checkReleaseDate(date);
     if (validationResult instanceof NoConstraintViolation) {
         this.releaseDate = date;
     } else {
+        console.log(validationResult.message);
         throw validationResult;
     }
 };
 
-Movie.instances = {};
 
 Movie.prototype.toString = function () {
     return "Movie{ ID:" + this.movieID + ", title:" + this.title +
@@ -216,17 +221,17 @@ Movie.loadSeedData = function () {
     Movie.instances["1"] = new Movie({
         movieID: "1",
         title: "Lord of the Rings: The Fellowship...",
-        releaseDate: 2000
+        releaseDate: "2001-12-19"
     });
     Movie.instances["2"] = new Movie({
         movieID: "2",
         title: "The Matrix",
-        releaseDate: 1999
+        releaseDate: "1999-03-31"
     });
     Movie.instances["3"] = new Movie({
         movieID: "3",
         title: "Looper",
-        releaseDate: 2008
+        releaseDate: "2012-09-28"
     });
     Movie.saveAll();
 };
